@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>const int N=10; // Number of prisoners
+
+// Array of flags used by each prisoner to know if he/she has been in the room or not
+typedef int[1,N] id_t;
+int[0,1] been[id_t];
+
+// Initially the room is empty and the light is off
+int[0,1] light = 0;
+int[0,1] roomEmpty = 1;
+
+// Counted number of prisoners that entered the room
+int[0,N] count = 1;
+int[0,1] free = 0;</declaration>
+	<template>
+		<name>Counter</name>
+		<parameter>int[0,N] &amp;count</parameter>
+		<location id="id0" x="0" y="0">
+			<name x="-76" y="-8">prison</name>
+		</location>
+		<location id="id1" x="408" y="8">
+			<name x="398" y="-26">theRoom</name>
+		</location>
+		<location id="id2" x="204" y="221">
+			<name x="194" y="187">declareEnd</name>
+		</location>
+		<init ref="id0"/>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id2"/>
+			<label kind="guard" x="0" y="110">count == N</label>
+			<label kind="assignment" x="-8" y="229">roomEmpty := 0, free := 1</label>
+			<nail x="0" y="144"/>
+			<nail x="59" y="221"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="289" y="-178">light == 0</label>
+			<label kind="assignment" x="42" y="-178">roomEmpty := 1</label>
+			<nail x="408" y="-93"/>
+			<nail x="357" y="-153"/>
+			<nail x="51" y="-153"/>
+			<nail x="0" y="-93"/>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="195" y="-93">light == 1</label>
+			<label kind="assignment" x="34" y="-51">roomEmpty := 1, count := count +1 , light := 0</label>
+			<nail x="348" y="-68"/>
+			<nail x="59" y="-68"/>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="guard" x="93" y="85">roomEmpty == 1 &amp;&amp; count != N</label>
+			<label kind="assignment" x="221" y="42">roomEmpty := 0</label>
+			<nail x="51" y="76"/>
+			<nail x="340" y="76"/>
+		</transition>
+	</template>
+	<template>
+		<name x="5" y="5">Prisoner</name>
+		<parameter>int[0,1] &amp;been</parameter>
+		<declaration>// Place local declarations here.</declaration>
+		<location id="id3" x="0" y="8">
+			<name x="-68" y="-17">prison</name>
+		</location>
+		<location id="id4" x="433" y="-127">
+			<name x="459" y="-136">firstTimeInTheRoom</name>
+		</location>
+		<location id="id5" x="433" y="153">
+			<name x="458" y="144">theRoom</name>
+		</location>
+		<location id="id6" x="-304" y="9">
+			<name x="-391" y="-8">freedom</name>
+		</location>
+		<init ref="id3"/>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id6"/>
+			<label kind="guard" x="-221" y="-17">free == 1</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="guard" x="357" y="-297">light == 1</label>
+			<label kind="assignment" x="0" y="-289">roomEmpty := 1</label>
+			<nail x="493" y="-170"/>
+			<nail x="493" y="-255"/>
+			<nail x="442" y="-297"/>
+			<nail x="-17" y="-297"/>
+			<nail x="-110" y="-212"/>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id3"/>
+			<label kind="assignment" x="102" y="272">roomEmpty := 1</label>
+			<nail x="433" y="238"/>
+			<nail x="382" y="297"/>
+			<nail x="-51" y="297"/>
+			<nail x="-76" y="221"/>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id3"/>
+			<label kind="guard" x="323" y="-204">light == 0</label>
+			<label kind="assignment" x="17" y="-204">light := 1, roomEmpty := 1, been := 1</label>
+			<nail x="433" y="-178"/>
+			<nail x="391" y="-212"/>
+			<nail x="0" y="-212"/>
+			<nail x="-51" y="-161"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id4"/>
+			<label kind="guard" x="8" y="-42">roomEmpty == 1 &amp;&amp; been == 0</label>
+			<label kind="assignment" x="255" y="-119">roomEmpty := 0</label>
+			<nail x="0" y="-59"/>
+			<nail x="76" y="-127"/>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id5"/>
+			<label kind="guard" x="8" y="42">roomEmpty == 1 &amp;&amp; been == 1</label>
+			<label kind="assignment" x="246" y="127">roomEmpty := 0</label>
+			<nail x="0" y="76"/>
+			<nail x="85" y="153"/>
+		</transition>
+	</template>
+	<system>// Template instantiations
+P(const id_t id) = Prisoner(been[id]);
+C = Counter(count);
+
+// List of processes to be composed into the system.
+system P, C;</system>
+	<queries>
+		<query>
+			<formula></formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
